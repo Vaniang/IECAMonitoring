@@ -305,12 +305,12 @@
               <input id="evalDate" type="date" required>
             </div>
             <div class="field">
-              <label for="clientName">Name of Client</label>
-              <input id="clientName" required placeholder="Full name">
+              <label for="clientName">Full Name of Client/Evaluator (Optional)</label>
+              <input id="clientName" placeholder="Leave blank for anonymous evaluation">
             </div>
             <div class="field">
-              <label for="clientPosition">Position</label>
-              <input id="clientPosition" placeholder="Position/designation">
+              <label for="clientPosition">Position (Optional)</label>
+              <input id="clientPosition" placeholder="Leave blank if not provided">
             </div>
             <div class="field">
               <label for="clientUnit">Unit/Section</label>
@@ -784,7 +784,7 @@ function renderFeedbackTable(){
     const label=interpretation(avg);
     return `<tr>
       <td>${formatDate(e.date)}</td>
-      <td><b>${escapeHTML(e.clientName)}</b><br><span style="color:#64748b">${escapeHTML(e.unit)}</span></td>
+      <td><b>${escapeHTML(e.clientName || "Anonymous Evaluator")}</b><br><span style="color:#64748b">${escapeHTML(e.unit)}</span></td>
       <td>${escapeHTML(e.subject)}</td>
       <td>${avg.toFixed(2)}</td>
       <td><span class="badge ${badgeClass(label)}">${label}</span></td>
