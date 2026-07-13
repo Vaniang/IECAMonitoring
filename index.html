@@ -100,6 +100,30 @@
   .rating-box{border:1px solid var(--border);border-radius:10px;padding:10px;background:#f8fafc}
   .rating-box strong{display:block;font-size:12px;margin-bottom:6px;color:var(--blue-dark)}
   .rating-box span{display:block;font-size:11px;color:var(--muted);min-height:30px;margin-bottom:6px}
+  .rating-box input[type="number"]{
+    width:100%;
+    padding:10px 11px;
+    border:1px solid #cbd5e1;
+    border-radius:9px;
+    background:#fff;
+    font-weight:800;
+    font-size:16px;
+    text-align:center;
+  }
+  .rating-box input[type="number"]:focus{
+    outline:2px solid #bfdbfe;
+    border-color:#60a5fa;
+  }
+  .rating-scale-guide{
+    grid-column:1/-1;
+    padding:10px 12px;
+    border:1px solid #bfdbfe;
+    border-radius:10px;
+    background:#eff6ff;
+    color:#1e3a8a;
+    font-size:12px;
+    line-height:1.5;
+  }
   .actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
   .btn{
     border:0;border-radius:9px;padding:10px 14px;cursor:pointer;font-weight:700;
@@ -442,47 +466,46 @@
 
           <h3 class="section-title" style="margin-top:20px">Material Quality Dimensions (MQD)</h3>
           <div class="ratings-grid">
+            <div class="rating-scale-guide">
+              Enter one number only: <b>5 – Excellent</b>, <b>4 – Very Satisfactory</b>,
+              <b>3 – Satisfactory</b>, <b>2 – Needs Improvement</b>, and <b>1 – Poor</b>.
+              After entering a valid number, the cursor automatically moves to the next criterion.
+            </div>
             <div class="rating-box">
               <strong>MQD1 — Clarity & Comprehension</strong>
               <span>Message and content are clear and easy to understand.</span>
-              <select id="mqd1" required>
-                <option value="">Select rating</option><option value="5">5 — Excellent</option><option value="4">4 — Very Satisfactory</option><option value="3">3 — Satisfactory</option><option value="2">2 — Needs Improvement</option><option value="1">1 — Poor</option>
-              </select>
+              <input id="mqd1" class="mqd-number" type="number" min="1" max="5" step="1"
+                inputmode="numeric" placeholder="1–5" aria-label="MQD1 rating from 1 to 5" required>
             </div>
             <div class="rating-box">
               <strong>MQD2 — Relevance & Utility</strong>
               <span>Information is relevant and useful to the intended audience.</span>
-              <select id="mqd2" required>
-                <option value="">Select rating</option><option value="5">5 — Excellent</option><option value="4">4 — Very Satisfactory</option><option value="3">3 — Satisfactory</option><option value="2">2 — Needs Improvement</option><option value="1">1 — Poor</option>
-              </select>
+              <input id="mqd2" class="mqd-number" type="number" min="1" max="5" step="1"
+                inputmode="numeric" placeholder="1–5" aria-label="MQD2 rating from 1 to 5" required>
             </div>
             <div class="rating-box">
               <strong>MQD3 — Visual Appeal & Aesthetics</strong>
               <span>Design, graphics, layout, and typography are professional.</span>
-              <select id="mqd3" required>
-                <option value="">Select rating</option><option value="5">5 — Excellent</option><option value="4">4 — Very Satisfactory</option><option value="3">3 — Satisfactory</option><option value="2">2 — Needs Improvement</option><option value="1">1 — Poor</option>
-              </select>
+              <input id="mqd3" class="mqd-number" type="number" min="1" max="5" step="1"
+                inputmode="numeric" placeholder="1–5" aria-label="MQD3 rating from 1 to 5" required>
             </div>
             <div class="rating-box">
               <strong>MQD4 — Accuracy & Trustworthiness</strong>
               <span>Information, data, facts, and spellings are accurate and reliable.</span>
-              <select id="mqd4" required>
-                <option value="">Select rating</option><option value="5">5 — Excellent</option><option value="4">4 — Very Satisfactory</option><option value="3">3 — Satisfactory</option><option value="2">2 — Needs Improvement</option><option value="1">1 — Poor</option>
-              </select>
+              <input id="mqd4" class="mqd-number" type="number" min="1" max="5" step="1"
+                inputmode="numeric" placeholder="1–5" aria-label="MQD4 rating from 1 to 5" required>
             </div>
             <div class="rating-box">
               <strong>MQD5 — Engagement</strong>
               <span>The material captures attention and keeps the audience engaged.</span>
-              <select id="mqd5" required>
-                <option value="">Select rating</option><option value="5">5 — Excellent</option><option value="4">4 — Very Satisfactory</option><option value="3">3 — Satisfactory</option><option value="2">2 — Needs Improvement</option><option value="1">1 — Poor</option>
-              </select>
+              <input id="mqd5" class="mqd-number" type="number" min="1" max="5" step="1"
+                inputmode="numeric" placeholder="1–5" aria-label="MQD5 rating from 1 to 5" required>
             </div>
             <div class="rating-box">
               <strong>MQD6 — Overall Effectiveness</strong>
               <span>The material achieves its purpose and conveys the intended call to action.</span>
-              <select id="mqd6" required>
-                <option value="">Select rating</option><option value="5">5 — Excellent</option><option value="4">4 — Very Satisfactory</option><option value="3">3 — Satisfactory</option><option value="2">2 — Needs Improvement</option><option value="1">1 — Poor</option>
-              </select>
+              <input id="mqd6" class="mqd-number" type="number" min="1" max="5" step="1"
+                inputmode="numeric" placeholder="1–5" aria-label="MQD6 rating from 1 to 5" required>
             </div>
           </div>
 
@@ -1220,6 +1243,35 @@ document.querySelectorAll(".nav-btn").forEach(btn=>{
 document.getElementById("globalYear").addEventListener("change",renderAll);
 document.getElementById("globalQuarter").addEventListener("change",renderAll);
 
+document.querySelectorAll(".mqd-number").forEach((input,index,inputs)=>{
+  input.addEventListener("input",()=>{
+    const raw = input.value.trim();
+
+    if(raw === ""){
+      input.setCustomValidity("");
+      return;
+    }
+
+    const value = Number(raw);
+    const valid = Number.isInteger(value) && value >= 1 && value <= 5;
+    input.setCustomValidity(valid ? "" : "Enter a whole number from 1 to 5.");
+
+    if(valid && raw.length === 1 && index < inputs.length - 1){
+      inputs[index + 1].focus();
+      inputs[index + 1].select();
+    }
+  });
+
+  input.addEventListener("blur",()=>{
+    if(input.value !== ""){
+      const value = Number(input.value);
+      if(!Number.isInteger(value) || value < 1 || value > 5){
+        input.reportValidity();
+      }
+    }
+  });
+});
+
 document.getElementById("feedbackForm").addEventListener("submit",e=>{
   e.preventDefault();
   const id=document.getElementById("feedbackId").value;
@@ -1236,8 +1288,8 @@ document.getElementById("feedbackForm").addEventListener("submit",e=>{
     feedbackClass:document.getElementById("feedbackClass").value,
     comments:document.getElementById("comments").value.trim()
   };
-  if(item.ratings.some(x=>!x || x<1 || x>5)){
-    alert("Please select a rating from 1 to 5 for all six MQD criteria.");
+  if(item.ratings.some(x=>!Number.isInteger(x) || x<1 || x>5)){
+    alert("Please enter a whole number from 1 to 5 for all six MQD criteria.");
     return;
   }
   const index=state.evaluations.findIndex(x=>x.id===id);
