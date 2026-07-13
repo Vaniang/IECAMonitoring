@@ -126,6 +126,101 @@
   .badge.poor{background:#fee2e2;color:#991b1b}
   .badge.cap{background:#fee2e2;color:#991b1b}
   .badge.ok{background:#dcfce7;color:#166534}
+  .material-link{
+    border:0;
+    background:transparent;
+    color:var(--blue);
+    padding:0;
+    text-align:left;
+    font-weight:800;
+    cursor:pointer;
+    text-decoration:underline;
+    text-underline-offset:3px;
+  }
+  .material-link:hover{color:var(--blue-dark)}
+  .metric-modal{
+    position:fixed;
+    inset:0;
+    z-index:100;
+    display:none;
+    align-items:center;
+    justify-content:center;
+    padding:18px;
+    background:rgba(15,23,42,.58);
+  }
+  .metric-modal.open{display:flex}
+  .metric-modal-card{
+    width:min(680px,100%);
+    max-height:90vh;
+    overflow:auto;
+    background:#fff;
+    border-radius:16px;
+    box-shadow:0 24px 60px rgba(0,0,0,.28);
+    border:1px solid var(--border);
+  }
+  .metric-modal-head{
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:16px;
+    padding:18px 20px;
+    border-bottom:1px solid var(--border);
+    background:#eef4fb;
+  }
+  .metric-modal-head h3{
+    margin:0;
+    color:var(--blue-dark);
+    font-size:19px;
+  }
+  .metric-modal-head p{
+    margin:4px 0 0;
+    color:var(--muted);
+    font-size:12px;
+  }
+  .modal-close{
+    width:34px;
+    height:34px;
+    border-radius:50%;
+    border:1px solid #cbd5e1;
+    background:#fff;
+    cursor:pointer;
+    font-size:20px;
+    line-height:1;
+  }
+  .metric-modal-body{padding:20px}
+  .metric-detail-grid{
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:12px;
+  }
+  .metric-detail{
+    padding:12px;
+    border:1px solid var(--border);
+    border-radius:10px;
+    background:#f8fafc;
+  }
+  .metric-detail.full{grid-column:1/-1}
+  .metric-detail label{
+    display:block;
+    margin-bottom:5px;
+    font-size:11px;
+    font-weight:800;
+    text-transform:uppercase;
+    letter-spacing:.04em;
+    color:var(--muted);
+  }
+  .metric-detail div{
+    font-size:14px;
+    line-height:1.45;
+    word-break:break-word;
+  }
+  .metric-modal-actions{
+    display:flex;
+    gap:8px;
+    justify-content:flex-end;
+    flex-wrap:wrap;
+    padding:0 20px 20px;
+  }
   .empty{padding:24px;text-align:center;color:var(--muted)}
   .bar-row{display:grid;grid-template-columns:190px 1fr 64px;gap:10px;align-items:center;margin:10px 0}
   .bar-label{font-size:12px}
@@ -186,6 +281,8 @@
     .report-signatures{grid-template-columns:1fr}
     .approved{grid-column:auto}
     .bar-row{grid-template-columns:130px 1fr 54px}
+    .metric-detail-grid{grid-template-columns:1fr}
+    .metric-detail.full{grid-column:auto}
   }
 
   @media print{
@@ -592,6 +689,23 @@
   </main>
 </div>
 
+<div id="metricDetailsModal" class="metric-modal" role="dialog" aria-modal="true" aria-labelledby="metricDetailsTitle">
+  <div class="metric-modal-card">
+    <div class="metric-modal-head">
+      <div>
+        <h3 id="metricDetailsTitle">External Metrics Details</h3>
+        <p>Complete information for the selected IECA material</p>
+      </div>
+      <button class="modal-close" type="button" onclick="closeMetricDetails()" aria-label="Close">&times;</button>
+    </div>
+    <div id="metricDetailsBody" class="metric-modal-body"></div>
+    <div class="metric-modal-actions">
+      <button class="btn outline" type="button" onclick="closeMetricDetails()">Close</button>
+      <button class="btn primary" type="button" id="editSelectedMetric">Edit Record</button>
+    </div>
+  </div>
+</div>
+
 <script>
 const MQD = [
   {code:"MQD1", name:"Clarity & Comprehension"},
@@ -797,6 +911,75 @@ function renderFeedbackTable(){
   }).join("");
 }
 
+let selectedMetricDetailsId = null;
+
+window.showMetricDetails = function(id){
+  const m = state.metrics.find(x => x.id === id);
+  if(!m) return;
+
+  selectedMetricDetailsId = id;
+  const sentiment = m.negativeSentiment
+    ? '<span class="badge cap">Yes — Corrective Action Review Needed</span>'
+    : '<span class="badge ok">No</span>';
+
+  document.getElementById("metricDetailsBody").innerHTML = `
+    <div class="metric-detail-grid">
+      <div class="metric-detail full">
+        <label>Material Title / Subject</label>
+        <div><b>${escapeHTML(m.title)}</b></div>
+      </div>
+      <div class="metric-detail">
+        <label>Date Posted</label>
+        <div>${formatDate(m.datePosted) || "—"}</div>
+      </div>
+      <div class="metric-detail">
+        <label>Date Metrics Logged</label>
+        <div>${formatDate(m.dateLogged) || "—"}</div>
+      </div>
+      <div class="metric-detail">
+        <label>Reach / Views</label>
+        <div><b>${formatNumber(m.reach)}</b></div>
+      </div>
+      <div class="metric-detail">
+        <label>Reactions</label>
+        <div><b>${formatNumber(m.reactions)}</b></div>
+      </div>
+      <div class="metric-detail">
+        <label>Shares</label>
+        <div><b>${formatNumber(m.shares)}</b></div>
+      </div>
+      <div class="metric-detail">
+        <label>Sentiment Alert</label>
+        <div>${sentiment}</div>
+      </div>
+      <div class="metric-detail full">
+        <label>Sentiment / Observation Notes</label>
+        <div>${escapeHTML(m.sentimentNotes || "No notes recorded.")}</div>
+      </div>
+    </div>`;
+
+  document.getElementById("metricDetailsModal").classList.add("open");
+};
+
+window.closeMetricDetails = function(){
+  document.getElementById("metricDetailsModal").classList.remove("open");
+  selectedMetricDetailsId = null;
+};
+
+document.getElementById("editSelectedMetric").addEventListener("click",()=>{
+  const id = selectedMetricDetailsId;
+  closeMetricDetails();
+  if(id) editMetric(id);
+});
+
+document.getElementById("metricDetailsModal").addEventListener("click",e=>{
+  if(e.target.id === "metricDetailsModal") closeMetricDetails();
+});
+
+document.addEventListener("keydown",e=>{
+  if(e.key === "Escape") closeMetricDetails();
+});
+
 function renderMetricsTable(){
   const rows=[...getQuarterMetrics()].sort((a,b)=>b.datePosted.localeCompare(a.datePosted));
   const body=document.getElementById("metricsTableBody");
@@ -806,7 +989,12 @@ function renderMetricsTable(){
   }
   body.innerHTML=rows.map(m=>`<tr>
     <td>${formatDate(m.datePosted)}</td>
-    <td><b>${escapeHTML(m.title)}</b><br><span style="color:#64748b">Logged ${formatDate(m.dateLogged)}</span></td>
+    <td>
+      <button class="material-link" type="button" onclick="showMetricDetails('${m.id}')" title="View complete external metrics details">
+        ${escapeHTML(m.title)}
+      </button>
+      <br><span style="color:#64748b">Logged ${formatDate(m.dateLogged)}</span>
+    </td>
     <td>${formatNumber(m.reach)}</td>
     <td>${formatNumber(m.reactions)}</td>
     <td>${formatNumber(m.shares)}</td>
