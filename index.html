@@ -148,6 +148,7 @@
     box-shadow:var(--shadow);padding:42px 48px;color:#111;
   }
   .report-header{text-align:center;margin-bottom:22px}
+  .report-header.blank{height:110px;margin-bottom:22px}
   .report-header .republic{font-family:"Times New Roman",serif;font-size:15px}
   .report-header .department{font-family:"Times New Roman",serif;font-size:25px;font-weight:700}
   .report-header .region{font-family:"Times New Roman",serif;font-size:15px;margin-top:3px}
@@ -875,12 +876,7 @@ function renderReport(){
       </div>`:"";
 
   report.innerHTML=`
-    <div class="report-header">
-      <div class="republic">Republic of the Philippines</div>
-      <div class="department">Department of Education</div>
-      <div class="region">REGION I</div>
-      <hr>
-    </div>
+    <div class="report-header blank"></div>
 
     <div class="report-title">MONITORING AND EVALUATION REPORT ON IECA MATERIALS PRODUCED</div>
 
@@ -919,12 +915,7 @@ function renderReport(){
 
     <div class="page-break"></div>
 
-    <div class="report-header">
-      <div class="republic">Republic of the Philippines</div>
-      <div class="department">Department of Education</div>
-      <div class="region">REGION I</div>
-      <hr>
-    </div>
+    <div class="report-header blank"></div>
 
     <h3>IV. Summary of Ratings Requiring Improvement</h3>
     <table class="report-table">
@@ -1127,7 +1118,7 @@ document.getElementById("downloadWord").addEventListener("click",()=>{
   const doc=`<!DOCTYPE html><html><head><meta charset="UTF-8">
   <style>
     body{font-family:"Times New Roman",serif;font-size:12pt;color:#000}
-    .report-header{text-align:center}.department{font-size:20pt;font-weight:bold}
+    .report-header{text-align:center}.report-header.blank{height:85px}.department{font-size:20pt;font-weight:bold}
     .report-title{text-align:center;font-weight:bold;margin:24px 0}
     table{border-collapse:collapse;width:100%}th,td{border:1px solid #000;padding:5px}
     th{text-align:center}.num{text-align:center}
