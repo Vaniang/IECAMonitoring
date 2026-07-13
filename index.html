@@ -899,7 +899,13 @@ function renderFeedbackTable(){
     return `<tr>
       <td>${formatDate(e.date)}</td>
       <td><b>${escapeHTML(e.clientName || "Anonymous Evaluator")}</b><br><span style="color:#64748b">${escapeHTML(e.unit)}</span></td>
-      <td>${escapeHTML(e.subject)}</td>
+      <td>
+        <button class="material-link" type="button"
+          onclick="openExternalMetricsForFeedback('${e.id}')"
+          title="Open the related External Metrics record">
+          ${escapeHTML(e.subject)}
+        </button>
+      </td>
       <td>${avg.toFixed(2)}</td>
       <td><span class="badge ${badgeClass(label)}">${label}</span></td>
       <td>${escapeHTML(e.feedbackSummary || e.comments || "—")}</td>
@@ -912,6 +918,49 @@ function renderFeedbackTable(){
 }
 
 let selectedMetricDetailsId = null;
+
+window.openExternalMetricsForFeedback = function(evaluationId){
+  const evaluation = state.evaluations.find(x => x.id === evaluationId);
+  if(!evaluation) return;
+
+  // Open the External Metrics section.
+  document.querySelectorAll(".nav-btn").forEach(b => b.classList.remove("active"));
+  document.querySelectorAll(".view").forEach(v => v.classList.remove("active"));
+
+  const metricsNav = document.querySelector('.nav-btn[data-view="metricsView"]');
+  if(metricsNav) metricsNav.classList.add("active");
+  document.getElementById("metricsView").classList.add("active");
+
+  const normalize = value => String(value || "").trim().toLowerCase();
+
+  // Prefer an exact title match in the selected quarter, then any exact match,
+  // then a close partial match.
+  let matches = getQuarterMetrics().filter(m => normalize(m.title) === normalize(evaluation.subject));
+
+  if(!matches.length){
+    matches = state.metrics.filter(m => normalize(m.title) === normalize(evaluation.subject));
+  }
+
+  if(!matches.length){
+    matches = state.metrics.filter(m => {
+      const metricTitle = normalize(m.title);
+      const subject = normalize(evaluation.subject);
+      return metricTitle.includes(subject) || subject.includes(metricTitle);
+    });
+  }
+
+  matches.sort((a,b) => String(b.datePosted || "").localeCompare(String(a.datePosted || "")));
+
+  if(matches.length){
+    showMetricDetails(matches[0].id);
+  }else{
+    // Make it faster to encode the missing external metrics record.
+    resetMetricsForm();
+    document.getElementById("materialTitle").value = evaluation.subject || "";
+    window.scrollTo({top:0, behavior:"smooth"});
+    alert("No matching External Metrics record was found. The Subject has been prefilled so you can encode the metrics.");
+  }
+};
 
 window.showMetricDetails = function(id){
   const m = state.metrics.find(x => x.id === id);
